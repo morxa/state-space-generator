@@ -29,9 +29,10 @@ print(files)
 setup(
     name="state_space_generator",
     version=__version__,
+    license='GNU',
     author="Dominik Drexler, Jendrik Seipp",
     author_email="dominik.drexler@liu.se, jendrik.seipp@liu.se",
-    url="https://github.com/drexlerd/downward-sse",
+    url="https://github.com/drexlerd/state-space-generator",
     description="A tool for state space exploration of PDDL files",
     long_description="",
     packages=['state_space_generator'],
