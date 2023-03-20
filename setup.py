@@ -28,7 +28,6 @@ files.append(str(Path("src/state_space_generator/scorpion/README.md").resolve())
 files.extend(compute_files(Path("src/state_space_generator/scorpion/driver")))
 files.extend(compute_files(Path("src/state_space_generator/scorpion/src")))
 files.extend(compute_files(Path("src/state_space_generator/scorpion/builds/release/bin")))
-print(files)
 
 setup(
     name="state_space_generator",
