@@ -5,7 +5,7 @@ from setuptools import setup
 from setuptools.command.install import install
 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 HERE = Path(__file__).resolve().parent
 
 
@@ -28,6 +28,7 @@ files.append(str(Path("src/state_space_generator/scorpion/README.md").resolve())
 files.extend(compute_files(Path("src/state_space_generator/scorpion/driver")))
 files.extend(compute_files(Path("src/state_space_generator/scorpion/src")))
 files.extend(compute_files(Path("src/state_space_generator/scorpion/builds/release/bin")))
+print(files)
 
 setup(
     name="state_space_generator",
