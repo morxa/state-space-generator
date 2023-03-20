@@ -1,31 +1,34 @@
-
 import subprocess
 from pathlib import Path
 
-
 from setuptools import setup
+from setuptools.command.install import install
 
-__version__ = "0.0.1"
+
+__version__ = "0.0.4"
 HERE = Path(__file__).resolve().parent
 
-# install planner binaries
-subprocess.check_call(
-    ["./build.py"], cwd=(HERE / "src/state_space_generator/scorpion")
-)
+
+class CustomInstallCommand(install):
+    """Customized setuptools install command - installs the planner first."""
+    def run(self):
+        install.run(self)
+        subprocess.check_call(["./src/state_space_generator/scorpion/build.py"])
 
 def compute_files(subdir):
-    print(subdir)
     return [str(p.resolve()) for p in subdir.rglob('*')]
 
 # Add Fast-Downward files to be copied
 files = []
 files.append(str(Path("src/state_space_generator/scorpion/fast-downward.py").resolve()))
-files.extend(compute_files(Path("src/state_space_generator/scorpion/builds/release/bin")))
+files.append(str(Path("src/state_space_generator/scorpion/build.py").resolve()))
+files.append(str(Path("src/state_space_generator/scorpion/build_configs.py").resolve()))
+files.append(str(Path("src/state_space_generator/scorpion/LICENSE.md").resolve()))
+files.append(str(Path("src/state_space_generator/scorpion/README.md").resolve()))
 files.extend(compute_files(Path("src/state_space_generator/scorpion/driver")))
+files.extend(compute_files(Path("src/state_space_generator/scorpion/src")))
+files.extend(compute_files(Path("src/state_space_generator/scorpion/builds/release/bin")))
 
-print(files)
-# The information here can also be placed in setup.cfg - better separation of
-# logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="state_space_generator",
     version=__version__,
@@ -40,4 +43,7 @@ setup(
     package_data={'': files},
     include_package_data=True,
     zip_safe=False,
+    cmdclass={
+        'install': CustomInstallCommand,
+    },
 )

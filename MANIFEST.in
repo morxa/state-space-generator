@@ -1,2 +1,8 @@
-include planners/downward-sse/fast-downward.py
-global-include planners/downward-sse/builds/release/bin/*
+include src/state_space_generator/scorpion/fast-downward.py
+include src/state_space_generator/scorpion/build.py
+include src/state_space_generator/scorpion/build_configs.py
+include src/state_space_generator/scorpion/LICENSE.md
+include src/state_space_generator/scorpion/README.md
+global-include src/state_space_generator/scorpion/driver/*
+global-include src/state_space_generator/scorpion/src/*
+global-include src/state_space_generator/scorpion/builds/release/bin/*
