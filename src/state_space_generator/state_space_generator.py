@@ -27,4 +27,5 @@ def generate_state_space(domain: str, problem: str, max_time: str = None):
         "--search",
         build_callstring(max_time)]
     print(f'Executing "{" ".join(map(str, command))}"')
-    subprocess.run(command)
+    with open("run.log", "w") as file:
+        subprocess.run(command, stdout=file,text=True)

@@ -5,7 +5,7 @@ from setuptools import setup
 from setuptools.command.install import install
 
 
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 HERE = Path(__file__).resolve().parent
 
 
