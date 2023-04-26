@@ -1,33 +1,22 @@
+import os
 import subprocess
 from pathlib import Path
 
-from setuptools import setup
-from setuptools.command.install import install
+from setuptools import setup, Extension, find_packages
+from setuptools.command.build_ext import build_ext
 
 
 __version__ = "0.0.8"
 HERE = Path(__file__).resolve().parent
 
 
-class CustomInstallCommand(install):
-    """Customized setuptools install command - installs the planner first."""
-    def run(self):
-        install.run(self)
-        subprocess.check_call(["./src/state_space_generator/scorpion/build.py"])
+class BuildExt(build_ext):
+    def build_extensions(self):
+        self.extensions = [
+            Extension('my_package.my_module', ['my_package/my_module.cpp'])
+        ]
+        super().build_extensions()  
 
-def compute_files(subdir):
-    return [str(p.resolve()) for p in subdir.rglob('*')]
-
-# Add Fast-Downward files to be copied
-files = []
-files.append(str(Path("src/state_space_generator/scorpion/fast-downward.py").resolve()))
-files.append(str(Path("src/state_space_generator/scorpion/build.py").resolve()))
-files.append(str(Path("src/state_space_generator/scorpion/build_configs.py").resolve()))
-files.append(str(Path("src/state_space_generator/scorpion/LICENSE.md").resolve()))
-files.append(str(Path("src/state_space_generator/scorpion/README.md").resolve()))
-files.extend(compute_files(Path("src/state_space_generator/scorpion/driver")))
-files.extend(compute_files(Path("src/state_space_generator/scorpion/src")))
-files.extend(compute_files(Path("src/state_space_generator/scorpion/builds/release/bin")))
 
 setup(
     name="state_space_generator",
@@ -40,10 +29,7 @@ setup(
     long_description="",
     packages=['state_space_generator'],
     package_dir={'state_space_generator': 'src/state_space_generator'},
-    package_data={'': files},
+    cmdclass={'build_ext': BuildExt},
     include_package_data=True,
     zip_safe=False,
-    cmdclass={
-        'install': CustomInstallCommand,
-    },
 )
