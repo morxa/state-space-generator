@@ -3,19 +3,22 @@ import subprocess
 from pathlib import Path
 
 from setuptools import setup, Extension, find_packages
-from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install as install
 
 
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 HERE = Path(__file__).resolve().parent
 
 
-class BuildExt(build_ext):
-    def build_extensions(self):
-        self.extensions = [
-            Extension('my_package.my_module', ['my_package/my_module.cpp'])
-        ]
-        super().build_extensions()  
+class CustomInstall(install):
+    def run(self):
+        # Get the build directory
+        build_dir = Path(self.build_lib).resolve()
+        print("Build directory:", build_dir)
+        subprocess.check_call([build_dir / "state_space_generator/scorpion/build.py"])
+
+        # this copies package data
+        super().run()
 
 
 setup(
@@ -28,8 +31,20 @@ setup(
     description="A tool for state space exploration of PDDL files",
     long_description="",
     packages=['state_space_generator'],
+    package_data={
+          "": ["src/state_space_generator/scorpion/fast-downward.py",
+               "src/state_space_generator/scorpion/build.py",
+              "src/state_space_generator/scorpion/README.md", 
+              "src/state_space_generator/scorpion/LICENSE.md",
+              "src/state_space_generator/scorpion/builds/release/bin/*",
+              "src/state_space_generator/scorpion/builds/release/bin/translate/*",
+              "src/state_space_generator/scorpion/builds/release/bin/translate/pddl/*",
+              "src/state_space_generator/scorpion/builds/release/bin/translate/pddl_parser/*",
+              "src/state_space_generator/scorpion/driver/*"]
+      },
     package_dir={'state_space_generator': 'src/state_space_generator'},
-    cmdclass={'build_ext': BuildExt},
+    cmdclass={"install": CustomInstall},
+    has_ext_modules=lambda: True,
     include_package_data=True,
     zip_safe=False,
 )
