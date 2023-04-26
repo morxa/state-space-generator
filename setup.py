@@ -6,7 +6,7 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.install import install as install
 
 
-__version__ = "0.0.9"
+__version__ = "0.1.0"
 HERE = Path(__file__).resolve().parent
 
 
