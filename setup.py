@@ -6,7 +6,7 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.install import install as install
 
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 HERE = Path(__file__).resolve().parent
 
 
@@ -15,7 +15,7 @@ class CustomInstall(install):
         # Get the build directory
         # build_dir = Path(self.build_lib).resolve()
         # print("Build directory:", build_dir)
-        subprocess.check_call(["src/state_space_generator/scorpion/build.py"])
+        subprocess.check_call(["./src/state_space_generator/scorpion/build.py"])
 
         # this copies package data
         super().run()
