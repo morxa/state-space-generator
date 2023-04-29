@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 
 from setuptools import setup
 from setuptools.command.build_py import build_py
@@ -13,7 +14,8 @@ class CustomBuild(build_py):
         """ Builds the scorpion binaries. """
         curr_dir = os.getcwd()
         os.chdir(os.path.join(curr_dir, 'state_space_generator/scorpion'))
-        subprocess.check_call(["python", "build.py"])
+        print(sys.executable)
+        subprocess.check_call([sys.executable, "build.py"])
         os.chdir(curr_dir)
         super().run()
 
@@ -39,5 +41,6 @@ setup(
     cmdclass={
         'build_py': CustomBuild},
     include_package_data=True,
+    has_ext_modules=lambda: True,  # to not obtain pure python wheels
     zip_safe=False,  # contains platform specific code
 )
