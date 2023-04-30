@@ -6,7 +6,7 @@ from setuptools import setup
 from setuptools.command.build_py import build_py
 
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 
 class CustomBuild(build_py):
@@ -36,7 +36,8 @@ setup(
          "scorpion/README.md",
          "scorpion/LICENSE.md",
          "scorpion/builds/release/bin/*",
-         "scorpion/driver/*"]
+         "scorpion/driver/*",
+         "scorpion/src/*"]
     },
     cmdclass={
         'build_py': CustomBuild},
