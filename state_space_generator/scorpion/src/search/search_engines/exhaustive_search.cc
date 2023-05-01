@@ -75,6 +75,9 @@ void ExhaustiveSearch::initialize() {
     statistics.inc_generated();
     // The initial state has id 0, so we'll start there.
     current_state_id = 0;
+    dump_state(initial_state);
+    SearchNode node = search_space.get_node(initial_state);
+    node.close();
 }
 
 void ExhaustiveSearch::print_statistics() const {
@@ -94,9 +97,7 @@ void ExhaustiveSearch::dump_state(const State &state) {
         }
     }
     std::cout << ss.str() << std::endl;
-    if (dump_states_to_file) {
-        states_file << ss.str() << "\n";
-    }
+    states_file << ss.str() << "\n";
 }
 
 SearchStatus ExhaustiveSearch::step() {
@@ -109,7 +110,6 @@ SearchStatus ExhaustiveSearch::step() {
 
     State s = state_registry.lookup_state(StateID(current_state_id));
     statistics.inc_expanded();
-    dump_state(s);
 
     /* Next time we'll look at the next state that was created in the registry.
        This results in a breadth-first order. */
@@ -126,6 +126,12 @@ SearchStatus ExhaustiveSearch::step() {
         cout << "T " << s.get_id().value << " " << succ_state.get_id().value << endl;
         if (dump_transitions_to_file) {
             transitions_file << s.get_id().value << " " << succ_state.get_id().value << "\n";
+        }
+
+        SearchNode node = search_space.get_node(succ_state);
+        if (dump_states_to_file && node.is_new()) {
+            dump_state(succ_state);
+            node.close();
         }
     }
     return IN_PROGRESS;

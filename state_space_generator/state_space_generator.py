@@ -29,3 +29,6 @@ def generate_state_space(domain: str, problem: str, max_time: str = None):
     print(f'Executing "{" ".join(map(str, command))}"')
     with open("run.log", "w") as file:
         subprocess.run(command, stdout=file,text=True)
+
+# for debugging purposes
+# python3 ./fast-downward.py ../../domain.pddl ../../p-1-0.pddl --translate-options --dump-static-predicates --dump-predicates --dump-constants --dump-static-atoms --dump-goal-atoms --search-options --search "dump_reachable_search_space(max_time=0)"
