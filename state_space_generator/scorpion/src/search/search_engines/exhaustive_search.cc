@@ -6,6 +6,7 @@
 #include "../task_utils/successor_generator.h"
 #include "../task_utils/task_properties.h"
 #include "../utils/logging.h"
+#include "../utils/countdown_timer.h"
 
 #include <algorithm>
 #include <cassert>
@@ -54,12 +55,11 @@ static vector<vector<int>> construct_and_dump_fact_mapping(
 
 ExhaustiveSearch::ExhaustiveSearch(const Options &opts)
     : SearchEngine(opts),
+      max_num_states(opts.get<int>("max_num_states")),
       dump_atoms_to_file(opts.get<bool>("dump_atoms")),
       dump_states_to_file(opts.get<bool>("dump_states")),
       dump_transitions_to_file(opts.get<bool>("dump_transitions")) {
     assert(cost_type == ONE);
-    states_file.open("states.txt");
-    transitions_file.open("transitions.txt");
 }
 
 void ExhaustiveSearch::initialize() {
@@ -78,6 +78,29 @@ void ExhaustiveSearch::initialize() {
     dump_state(initial_state);
     SearchNode node = search_space.get_node(initial_state);
     node.close();
+}
+
+void ExhaustiveSearch::search() {
+    states_file.open("states.txt");
+    transitions_file.open("transitions.txt");
+    initialize();
+    utils::CountdownTimer timer(max_time);
+    while (status == IN_PROGRESS) {
+        status = step();
+        if (timer.is_expired()) {
+            log << "Time limit reached. Abort search." << endl;
+            status = TIMEOUT;
+            break;
+        }
+        if (state_registry.size() >= max_num_states) {
+            log << "Num states limit reached. Abort search." << endl;
+            status = RESOURCEOUT;
+            break;
+        }
+    }
+    states_file.close();
+    transitions_file.close();
+    log << "Actual search time: " << timer.get_elapsed_time() << endl;
 }
 
 void ExhaustiveSearch::print_statistics() const {
@@ -103,8 +126,6 @@ void ExhaustiveSearch::dump_state(const State &state) {
 SearchStatus ExhaustiveSearch::step() {
     if (current_state_id == static_cast<int>(state_registry.size())) {
         utils::g_log << "Finished dumping the reachable state space." << endl;
-        states_file.close();
-        transitions_file.close();
         return FAILED;
     }
 
@@ -132,6 +153,9 @@ SearchStatus ExhaustiveSearch::step() {
         if (dump_states_to_file && node.is_new()) {
             dump_state(succ_state);
             node.close();
+            if (state_registry.size() >= max_num_states) {
+                return FAILED;
+            }
         }
     }
     return IN_PROGRESS;
@@ -146,6 +170,10 @@ static shared_ptr<SearchEngine> _parse(OptionParser &parser) {
     parser.add_option<double>(
         "max_time",
         "The timit limit in seconds for generating the state space.",
+        "infinity");
+    parser.add_option<int>(
+        "max_num_states",
+        "The timit on the maximum number of states in the state space.",
         "infinity");
 
     Options opts = parser.parse();

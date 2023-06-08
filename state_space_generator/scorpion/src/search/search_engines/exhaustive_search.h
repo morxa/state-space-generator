@@ -16,6 +16,7 @@ class ExhaustiveSearch : public SearchEngine {
 
     void dump_state(const State &state);
 
+    int max_num_states;
     bool dump_atoms_to_file;
     bool dump_states_to_file;
     bool dump_transitions_to_file;
@@ -29,6 +30,8 @@ protected:
 
 public:
     explicit ExhaustiveSearch(const options::Options &opts);
+
+    virtual void search() override;
 
     virtual void print_statistics() const override;
 };

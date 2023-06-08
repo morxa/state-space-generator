@@ -6,7 +6,7 @@ from setuptools import setup
 from setuptools.command.build_py import build_py
 
 
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 
 class CustomBuild(build_py):
