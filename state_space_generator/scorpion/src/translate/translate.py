@@ -707,31 +707,24 @@ def dump_statistics(sas_task):
         print("Translator peak memory: %d KB" % peak_memory)
 
 
-def dump_predicates(task, path):
-    """ Deprecated method. """
-    raise Exception()
-    predicates = [
-        (predicate.name, len(predicate.arguments))
-        for predicate in task.predicates
-        if not predicate.name.startswith("=")
-    ]
-    predicates += [(pddl_type.name, 1) for pddl_type in task.types]
-
-    with open(path, "w") as f:
-        f.write("\n".join(f"{name} {arity}"
-                          for name, arity in sorted(predicates)))
-
-
 def dump_goal_atoms(task, path):
     goal_atoms = collect_goal_atoms_in_conjunction(task.goal)
     with open(path, "w") as f:
         for atom in goal_atoms:
-            instantiate.print_atom(atom, file=f)
+            if isinstance(atom, pddl.conditions.Atom):
+                instantiate.print_atom(atom, file=f)
+
+
+def dump_goal_negated_atoms(task, path):
+    goal_atoms = collect_goal_negated_atoms_in_conjunction(task.goal)
+    with open(path, "w") as f:
+        for atom in goal_atoms:
+            if isinstance(atom, pddl.conditions.NegatedAtom):
+                instantiate.print_negated_atom(atom, file=f)
 
 
 def collect_goal_atoms_in_conjunction(goal):
-    """ Recursively parses a Conjunction of Atoms into a list of Atoms. """
-    print(goal)
+    """ Recursively parses a Conjunction of literals into a list of literals. """
     if isinstance(goal, pddl.conditions.Conjunction):
         goal_atoms = []
         for part in goal.parts:
@@ -739,10 +732,29 @@ def collect_goal_atoms_in_conjunction(goal):
         return goal_atoms
     elif isinstance(goal, pddl.conditions.Atom):
         return [goal]
+    elif isinstance(goal, pddl.conditions.NegatedAtom):
+        return []
     elif isinstance(goal, pddl.conditions.Truth):
         return []
     else:
-        raise Exception("Only conjunctive goals can be dumped.")
+        raise Exception("Only conjunctive literals can be dumped.")
+
+
+def collect_goal_negated_atoms_in_conjunction(goal):
+    """ Recursively parses a Conjunction of literals into a list of literals. """
+    if isinstance(goal, pddl.conditions.Conjunction):
+        goal_atoms = []
+        for part in goal.parts:
+            goal_atoms.extend(collect_goal_negated_atoms_in_conjunction(part))
+        return goal_atoms
+    elif isinstance(goal, pddl.conditions.Atom):
+        return []
+    elif isinstance(goal, pddl.conditions.NegatedAtom):
+        return [goal]
+    elif isinstance(goal, pddl.conditions.Truth):
+        return []
+    else:
+        raise Exception("Only conjunctive literals can be dumped.")
 
 
 def dump_constants(task, path):
@@ -756,14 +768,13 @@ def main():
     with timers.timing("Parsing", True):
         task = pddl_parser.open(
             domain_filename=options.domain, task_filename=options.task)
-    #if options.dump_predicates:
-    #    dump_predicates(task, "predicates.txt")
 
     if options.dump_constants:
         dump_constants(task, "constants.txt")
 
     if options.dump_goal_atoms:
         dump_goal_atoms(task, "goal-atoms.txt")
+        dump_goal_negated_atoms(task, "goal-negated-atoms.txt")
 
     with timers.timing("Normalizing task"):
         normalize.normalize(task)

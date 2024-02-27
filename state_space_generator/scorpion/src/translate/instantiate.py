@@ -18,6 +18,11 @@ def print_atom(atom, file):
     assert atom_name.startswith("Atom ")
     print(atom_name[len("Atom "):].replace(" ", ""), file=file)
 
+def print_negated_atom(negated_atom, file):
+    atom_name = str(negated_atom)
+    assert atom_name.startswith("NegatedAtom ")
+    print(atom_name[len("NegatedAtom "):].replace(" ", ""), file=file)
+
 def add_type_predicates(types):
     result = []
     for k, l in types.items():
