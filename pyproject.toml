@@ -13,6 +13,7 @@ archs = "auto64"
 container-engine = "docker"
 manylinux-x86_64-image = "manylinux2014"
 manylinux-i686-image = "manylinux2014"
+skip = "*musllinux*"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
