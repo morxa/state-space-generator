@@ -21,7 +21,7 @@ class CustomBuild(build_py):
 
 
 setup(
-    name="state_space_generator",
+    name="state_space_generator_morxa",
     version=__version__,
     license='GNU',
     author="Dominik Drexler, Jendrik Seipp",
